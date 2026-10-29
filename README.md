@@ -1,51 +1,45 @@
-# Parcela Web
+# ParcelaWeb — sincronização em nuvem
 
-Aplicação web responsiva/PWA para controle de produtos e parcelas, com tema escuro, detalhes alaranjados, gráficos, armazenamento local, edição de parcelas, importação/exportação de backup e modo offline após a primeira visita.
+Site estático/PWA para controle de produtos e parcelas. O login e a sincronização usam Supabase Auth + PostgreSQL + RLS. O site continua hospedado no GitHub Pages.
+
+## Antes de publicar esta versão
+
+1. No Supabase SQL Editor, execute o arquivo `supabase-migration.sql`. Ele adiciona os campos `label`, `month` e `updated_at` que a interface utiliza.
+2. Confirme em **Authentication → URL Configuration** que Site URL e Redirect URL incluem `https://SEU-USUARIO.github.io/SEU-REPOSITORIO/`.
+3. Em **Authentication → Sign In / Providers**, mantenha Email habilitado e cadastro permitido. A confirmação de e-mail pode permanecer ativada.
+4. Verifique que RLS está ativo em `products` e `installments`, com políticas `FOR ALL` para `authenticated`, `USING (user_id = auth.uid())` e `WITH CHECK` equivalente. Nunca exponha `service_role`/secret key.
+5. Envie o conteúdo desta pasta para a raiz do repositório do GitHub Pages e aguarde a publicação.
+
+## Credenciais no navegador
+
+A URL do projeto e a chave **Publishable** estão no começo de `app.js`. A publishable key é feita para o navegador; a segurança depende das políticas RLS. Nunca coloque uma `service_role` ou `sb_secret_...` no frontend.
+
+## Primeira utilização e migração local
+
+- Abra o site e crie uma conta com e-mail e senha.
+- Se a conta já tiver dados na nuvem, o site perguntará antes de substituir a visualização local.
+- Se a nuvem estiver vazia e o navegador tiver dados locais, o site perguntará se deseja enviá-los para a conta. Confira os registros antes de confirmar.
+- Os dados locais não são apagados automaticamente durante a migração. Exporte um backup JSON em Configurações antes de trocar de aparelho ou migrar dados.
+- Use a mesma conta nos dispositivos. Alterações são enviadas ao Supabase e atualizações remotas são recebidas por Realtime quando habilitado.
+
+## Tabelas esperadas
+
+`products`: `id` UUID, `user_id` UUID, `name`, `total_amount`, `installments_count`, `notes`, `created_at`, `updated_at`.
+
+`installments`: `id` UUID, `user_id` UUID, `product_id` UUID, `installment_number`, `amount`, `due_date`, `paid`, `paid_at`, `label`, `month`, `created_at`, `updated_at`.
+
+## Limitações importantes
+
+- A primeira versão de sincronização não é um editor colaborativo com resolução sofisticada de conflitos. Evite editar o mesmo registro simultaneamente em dois aparelhos; use **Sincronizar agora** para atualizar manualmente.
+- Realtime precisa estar habilitado para as duas tabelas na publicação `supabase_realtime`.
+- O Supabase free pode ter limites de uso e inatividade; consulte o painel do serviço.
+- Se o login funcionar mas o banco der erro, confira se executou `supabase-migration.sql` e se as políticas RLS existem.
+- O site antigo pode ter cache de service worker. Após publicar, faça `Ctrl+F5`; no celular, feche e reabra o app. Se persistir código antigo, limpe os dados do site e entre novamente após exportar o backup.
 
 ## Arquivos
 
-- `index.html` — interface e modais de cadastro.
+- `index.html` — interface e autenticação.
 - `styles.css` — tema responsivo.
-- `app.js` — dados, cálculos, gráficos e CRUD.
-- `manifest.webmanifest` — configuração PWA.
-- `sw.js` — cache offline.
-- `icons/` — ícones da aplicação.
-- `.nojekyll` — evita processamento Jekyll no GitHub Pages.
-
-## Publicar no GitHub Pages
-
-1. Crie um repositório (ou use o repositório escolhido).
-2. Envie **o conteúdo desta pasta**, não o ZIP, para a raiz do repositório. Mantenha `.nojekyll`.
-3. No GitHub, abra **Settings → Pages**.
-4. Em **Build and deployment**, selecione **Deploy from a branch**.
-5. Selecione `main` e `/ (root)`, depois clique em **Save**.
-6. Aguarde a publicação e abra o endereço mostrado na página Pages.
-
-O service worker e a instalação PWA exigem HTTPS; GitHub Pages fornece HTTPS.
-
-## Dados e privacidade
-
-Os dados ficam no `localStorage` do navegador e não são enviados a um servidor. Isso significa que:
-- celular e computador não sincronizam entre si;
-- limpar os dados do site pode apagar os registros;
-- exporte backups regularmente em **Configurações → Exportar dados**;
-- importar um backup substitui os dados atuais.
-
-## Widget Android
-
-Uma PWA não cria diretamente um widget nativo na tela inicial do Android. Para ter um widget com botões de pagamento, é necessário manter uma implementação Android nativa.
-
-## Dados iniciais e privacidade
-
-A aplicação começa com dois registros **fictícios**, apenas para demonstrar a interface. Exclua-os ou substitua-os pelos seus próprios dados.
-
-Os registros reais adicionados na aplicação ficam no `localStorage` do navegador e não são enviados a um servidor. Ainda assim, não coloque dados financeiros pessoais diretamente em `app.js`, `index.html`, no README ou em outros arquivos do repositório, especialmente se ele for público.
-
-**Atenção ao histórico do Git:** apagar informações de um arquivo não as remove dos commits anteriores. Se uma versão antiga com dados pessoais já foi enviada ao repositório, crie um repositório público novo a partir desta versão sanitizada, em vez de simplesmente tornar público o repositório antigo.
-
-## Cálculos
-
-- O total pago e o saldo em aberto são calculados a partir das parcelas marcadas.
-- O percentual usa a soma das parcelas como base quando a quantidade prevista está completa. Se ainda faltarem parcelas para cadastrar, usa o preço total informado quando disponível.
-- O preço informado é preservado em campo separado da soma das parcelas.
-- Alterações são gravadas no navegador automaticamente.
+- `app.js` — lógica, autenticação, sincronização e CRUD.
+- `supabase-migration.sql` — ajuste de esquema e publicação Realtime.
+- `manifest.webmanifest`, `sw.js`, `icons/` — PWA.

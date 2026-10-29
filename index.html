@@ -12,7 +12,22 @@
   <title>Parcela — Controle financeiro</title>
 </head>
 <body>
-  <div class="app-shell">
+  <section id="auth-screen" class="auth-screen">
+    <div class="auth-card">
+      <div class="brand auth-brand"><span class="brand-mark">P</span><span>parcela<span class="brand-dot">.</span><small>SINCRONIZAÇÃO NA NUVEM</small></span></div>
+      <h1 id="auth-title">Entre na sua conta</h1>
+      <p class="muted" id="auth-description">Use a mesma conta no celular e no computador para sincronizar seus produtos e parcelas.</p>
+      <form id="auth-form">
+        <label>E-mail<input id="auth-email" type="email" autocomplete="email" required placeholder="voce@exemplo.com"></label>
+        <label>Senha<input id="auth-password" type="password" autocomplete="current-password" minlength="8" required placeholder="Pelo menos 8 caracteres"></label>
+        <div id="auth-error" class="auth-message hidden" role="alert"></div>
+        <button id="auth-submit" class="primary-btn auth-submit" type="submit">Entrar</button>
+      </form>
+      <div class="auth-actions"><button id="auth-toggle" class="text-btn" type="button">Criar conta</button><button id="auth-reset" class="text-btn" type="button">Esqueci a senha</button></div>
+      <p class="auth-foot">Seus dados financeiros ficam associados à sua conta. Nunca use a senha do banco de dados aqui.</p>
+    </div>
+  </section>
+  <div class="app-shell" id="app-shell">
     <aside class="sidebar">
       <a class="brand" href="#" data-view="dashboard">
         <span class="brand-mark">P</span><span>parcela<span class="brand-dot">.</span><small>CONTROLE FINANCEIRO</small></span>
@@ -24,7 +39,7 @@
         <button class="nav-link" data-view="reports"><span>▥</span> Relatórios</button>
       </nav>
       <div class="sidebar-bottom">
-        <div class="local-status"><span class="status-dot"></span><div><b>Dados neste dispositivo</b><small>Armazenamento local ativo</small></div></div>
+        <div class="local-status"><span class="status-dot"></span><div><b id="sync-status-title">Sincronização</b><small id="sync-status-text">Aguardando login</small></div></div>
         <button class="nav-link" data-view="settings"><span>⚙</span> Configurações</button>
       </div>
     </aside>
@@ -35,7 +50,7 @@
         <div class="topbar-right">
           <span class="today-label" id="today-label"></span>
           <button class="icon-btn" id="export-shortcut" title="Exportar backup" aria-label="Exportar backup">⇩</button>
-          <button class="avatar" title="Perfil local">V</button>
+          <button class="avatar" id="account-btn" title="Conta e sair">?</button>
         </div>
       </header>
 
@@ -73,8 +88,9 @@
       </section>
 
       <section id="view-settings" class="view">
-        <div class="page-heading"><div><p class="eyebrow">PREFERÊNCIAS E SEGURANÇA</p><h1>Configurações</h1><p class="muted">Seus dados são armazenados neste navegador.</p></div></div>
+        <div class="page-heading"><div><p class="eyebrow">PREFERÊNCIAS E SEGURANÇA</p><h1>Configurações</h1><p class="muted">Sua conta sincroniza os dados entre dispositivos; o navegador mantém uma cópia local de apoio.</p></div></div>
         <div class="settings-grid">
+          <article class="panel settings-card"><span class="settings-symbol">☁</span><h2>Conta e sincronização</h2><p class="muted">A conta ativa sincroniza produtos e parcelas com o Supabase. Use a mesma conta nos outros aparelhos.</p><button class="secondary-btn" id="sync-now-btn">Sincronizar agora</button> <button class="secondary-btn" id="signout-btn">Sair da conta</button></article>
           <article class="panel settings-card"><span class="settings-symbol">⇩</span><h2>Exportar backup</h2><p class="muted">Baixe seus produtos e parcelas em um arquivo JSON para guardar ou transferir.</p><button class="secondary-btn" id="export-btn">Exportar dados</button></article>
           <article class="panel settings-card"><span class="settings-symbol">⇧</span><h2>Importar backup</h2><p class="muted">Restaure um arquivo JSON exportado anteriormente. Isso substitui os dados atuais.</p><label class="secondary-btn file-btn">Selecionar arquivo<input type="file" id="import-file" accept=".json,application/json"></label></article>
           <article class="panel settings-card"><span class="settings-symbol">▣</span><h2>Instalar como aplicativo</h2><p class="muted" id="install-help">Em navegadores compatíveis, use o menu do navegador e escolha “Instalar app” ou “Adicionar à tela inicial”.</p><button class="secondary-btn hidden" id="install-btn">Instalar Parcela</button></article>
@@ -121,6 +137,7 @@
     </form>
   </dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./app.js"></script>
 </body>
 </html>
