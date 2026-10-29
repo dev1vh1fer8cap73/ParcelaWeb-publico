@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111416">
+  <meta name="description" content="Controle financeiro pessoal e acompanhamento de parcelas.">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon-192.png">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="stylesheet" href="./styles.css">
+  <title>Parcela — Controle financeiro</title>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#" data-view="dashboard">
+        <span class="brand-mark">P</span><span>parcela<span class="brand-dot">.</span><small>CONTROLE FINANCEIRO</small></span>
+      </a>
+      <nav class="side-nav" aria-label="Navegação principal">
+        <button class="nav-link active" data-view="dashboard"><span>◫</span> Visão geral</button>
+        <button class="nav-link" data-view="products"><span>▤</span> Produtos <b id="nav-product-count">7</b></button>
+        <button class="nav-link" data-view="installments"><span>☷</span> Parcelas</button>
+        <button class="nav-link" data-view="reports"><span>▥</span> Relatórios</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="local-status"><span class="status-dot"></span><div><b>Dados neste dispositivo</b><small>Armazenamento local ativo</small></div></div>
+        <button class="nav-link" data-view="settings"><span>⚙</span> Configurações</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="mobile-brand"><span class="brand-mark">P</span> parcela<span class="brand-dot">.</span></div>
+        <div class="topbar-right">
+          <span class="today-label" id="today-label"></span>
+          <button class="icon-btn" id="export-shortcut" title="Exportar backup" aria-label="Exportar backup">⇩</button>
+          <button class="avatar" title="Perfil local">V</button>
+        </div>
+      </header>
+
+      <section id="view-dashboard" class="view active">
+        <div class="page-heading">
+          <div><p class="eyebrow">SEU DINHEIRO, SOB CONTROLE</p><h1>Visão geral</h1><p class="muted">Acompanhe pagamentos e o que ainda falta pagar.</p></div>
+          <button class="primary-btn" id="add-product-top"><span>＋</span> Adicionar produto</button>
+        </div>
+        <div class="stat-grid" id="dashboard-stats"></div>
+        <div class="charts-grid">
+          <article class="panel chart-panel"><div class="panel-heading"><div><h2>Percentual pago</h2><p class="muted">Progresso por produto</p></div><span class="chart-icon">↗</span></div><div id="percent-chart" class="bar-chart"></div></article>
+          <article class="panel chart-panel"><div class="panel-heading"><div><h2>Valor restante</h2><p class="muted">Em reais (R$)</p></div><span class="chart-icon">R$</span></div><div id="remaining-chart" class="bar-chart"></div></article>
+        </div>
+        <div class="section-heading"><div><h2>Seus produtos</h2><p class="muted">Selecione um produto para gerenciar as parcelas.</p></div><button class="text-btn" data-view="products">Ver todos →</button></div>
+        <div id="dashboard-products" class="product-grid"></div>
+        <div class="notice"><span>ⓘ</span><div><b>Sobre os valores</b><p>O preço informado é mantido separado da soma das parcelas. Divergências e suposições estão sinalizadas; os dados não são corrigidos automaticamente.</p></div></div>
+      </section>
+
+      <section id="view-products" class="view">
+        <div class="page-heading"><div><p class="eyebrow">CADASTRO E ACOMPANHAMENTO</p><h1>Produtos</h1><p class="muted">Cada produto tem sua própria página de parcelas.</p></div><button class="primary-btn" id="add-product-page"><span>＋</span> Adicionar produto</button></div>
+        <div class="toolbar"><label class="searchbox">⌕ <input id="product-search" placeholder="Buscar produto..." /></label><span id="product-list-count" class="muted"></span></div>
+        <div id="products-list" class="product-grid"></div>
+      </section>
+
+      <section id="view-installments" class="view">
+        <div class="page-heading"><div><p class="eyebrow">PAGAMENTOS INDIVIDUAIS</p><h1>Parcelas</h1><p class="muted">Marque cada parcela como paga para atualizar os cálculos.</p></div><button class="primary-btn" id="add-installment-top"><span>＋</span> Adicionar parcela</button></div>
+        <div class="toolbar"><label class="searchbox">⌕ <input id="installment-search" placeholder="Buscar produto ou parcela..." /></label><select id="installment-filter" class="select"><option value="all">Todas as parcelas</option><option value="pending">Pendentes</option><option value="paid">Pagas</option></select></div>
+        <div class="panel table-panel"><div class="table-wrap"><table><thead><tr><th>Pago</th><th>Parcela</th><th>Produto</th><th>Mês / ano</th><th>Valor</th><th></th></tr></thead><tbody id="installments-table"></tbody></table></div><div id="installments-empty" class="empty-state hidden">Nenhuma parcela encontrada.</div></div>
+      </section>
+
+      <section id="view-reports" class="view">
+        <div class="page-heading"><div><p class="eyebrow">ANÁLISE FINANCEIRA</p><h1>Relatórios</h1><p class="muted">Resumo calculado a partir das parcelas cadastradas.</p></div></div>
+        <div class="stat-grid" id="report-stats"></div>
+        <div class="panel table-panel"><div class="panel-heading"><div><h2>Resumo por produto</h2><p class="muted">Preço informado, parcelas e saldo calculado</p></div></div><div class="table-wrap"><table><thead><tr><th>Produto</th><th>Preço informado</th><th>Parcelas cadastradas</th><th>Pago</th><th>Restante</th><th>Diferença</th></tr></thead><tbody id="report-table"></tbody></table></div></div>
+      </section>
+
+      <section id="view-settings" class="view">
+        <div class="page-heading"><div><p class="eyebrow">PREFERÊNCIAS E SEGURANÇA</p><h1>Configurações</h1><p class="muted">Seus dados são armazenados neste navegador.</p></div></div>
+        <div class="settings-grid">
+          <article class="panel settings-card"><span class="settings-symbol">⇩</span><h2>Exportar backup</h2><p class="muted">Baixe seus produtos e parcelas em um arquivo JSON para guardar ou transferir.</p><button class="secondary-btn" id="export-btn">Exportar dados</button></article>
+          <article class="panel settings-card"><span class="settings-symbol">⇧</span><h2>Importar backup</h2><p class="muted">Restaure um arquivo JSON exportado anteriormente. Isso substitui os dados atuais.</p><label class="secondary-btn file-btn">Selecionar arquivo<input type="file" id="import-file" accept=".json,application/json"></label></article>
+          <article class="panel settings-card"><span class="settings-symbol">▣</span><h2>Instalar como aplicativo</h2><p class="muted" id="install-help">Em navegadores compatíveis, use o menu do navegador e escolha “Instalar app” ou “Adicionar à tela inicial”.</p><button class="secondary-btn hidden" id="install-btn">Instalar Parcela</button></article>
+          <article class="panel settings-card danger-card"><span class="settings-symbol">!</span><h2>Restaurar dados iniciais</h2><p class="muted">Apaga as alterações locais e restaura os dados iniciais do arquivo financeiro.</p><button class="danger-btn" id="reset-btn">Restaurar dados iniciais</button></article>
+        </div>
+        <div class="notice"><span>ⓘ</span><div><b>Limitações do armazenamento local</b><p>Os dados não são sincronizados automaticamente entre celular e computador. Limpar os dados do navegador pode apagá-los; exporte backups periodicamente. A versão web não cria widgets nativos do Android.</p></div></div>
+      </section>
+
+      <section id="view-detail" class="view">
+        <button class="back-link" id="back-to-products">← Voltar para produtos</button>
+        <div id="product-detail"></div>
+      </section>
+      <footer class="footer"><span>Parcela <b>v1.0</b></span><span>Privado por padrão · armazenamento local</span></footer>
+    </main>
+  </div>
+
+  <nav class="mobile-nav" aria-label="Navegação móvel">
+    <button class="active" data-view="dashboard"><span>◫</span>Início</button>
+    <button data-view="products"><span>▤</span>Produtos</button>
+    <button data-view="installments"><span>☷</span>Parcelas</button>
+    <button data-view="reports"><span>▥</span>Relatórios</button>
+  </nav>
+
+  <dialog id="product-modal" class="modal">
+    <form id="product-form" method="dialog">
+      <div class="modal-heading"><div><p class="eyebrow">CADASTRO</p><h2 id="product-modal-title">Adicionar produto</h2></div><button type="button" class="close-btn" data-close="product-modal">×</button></div>
+      <input type="hidden" id="product-id">
+      <label>Nome do produto<input id="product-name" required maxlength="100" placeholder="Ex.: Notebook"></label>
+      <div class="form-row"><label>Preço total informado (R$)<input id="product-price" inputmode="decimal" placeholder="Ex.: 1.800,00"></label><label>Quantidade prevista<input id="product-quantity" type="number" min="1" max="500" required placeholder="Ex.: 12"></label></div>
+      <label>Observações<textarea id="product-notes" rows="3" placeholder="Divergências, condições ou lembretes..."></textarea></label>
+      <div class="modal-actions"><button type="button" class="secondary-btn" data-close="product-modal">Cancelar</button><button type="submit" class="primary-btn">Salvar produto</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="installment-modal" class="modal">
+    <form id="installment-form" method="dialog">
+      <div class="modal-heading"><div><p class="eyebrow">PAGAMENTO INDIVIDUAL</p><h2 id="installment-modal-title">Adicionar parcela</h2></div><button type="button" class="close-btn" data-close="installment-modal">×</button></div>
+      <input type="hidden" id="installment-id">
+      <label>Identificação<input id="installment-label" required maxlength="100" placeholder="Ex.: Parcela 1"></label>
+      <div class="form-row"><label>Mês / ano (opcional)<input id="installment-month" placeholder="Ex.: Outubro (ano não informado)"></label><label>Valor (R$)<input id="installment-amount" required inputmode="decimal" placeholder="Ex.: 100,00"></label></div>
+      <label>Produto relacionado<select id="installment-product" required></select></label>
+      <label class="check-label"><input type="checkbox" id="installment-paid"> Pago</label>
+      <div class="modal-actions"><button type="button" class="secondary-btn" data-close="installment-modal">Cancelar</button><button type="submit" class="primary-btn">Salvar parcela</button></div>
+    </form>
+  </dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="./app.js"></script>
+</body>
+</html>
